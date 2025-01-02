@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MoodOverMind</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: url('/api/placeholder/1920/1080') center/cover;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .header h1 {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 24px;
+            font-style: italic;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: 2px solid #2E7D32;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        h2 {
+            color: #2E7D32;
+            margin-bottom: 15px;
+        }
+
+        .mood-buttons {
+            display: flex;
+            justify-content: space-around;
+            margin: 10px 0;
+        }
+
+        .mood-btn {
+            font-size: 24px;
+            padding: 10px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .mood-btn:hover {
+            transform: scale(1.2);
+        }
+
+        #moodResponse {
+            text-align: center;
+            margin: 10px 0;
+            font-size: 18px;
+            color: #2E7D32;
+        }
+
+        #journal {
+            width: 100%;
+            height: 150px;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #2E7D32;
+            border-radius: 5px;
+            resize: vertical;
+        }
+
+        .breathing-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        #breathingCircle {
+            width: 100px;
+            height: 100px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            transition: transform 0.5s ease;
+        }
+
+        .resources-list {
+            list-style: none;
+        }
+
+        .resources-list li {
+            margin: 10px 0;
+        }
+
+        .resources-list a {
+            color: #2E7D32;
+            text-decoration: none;
+        }
+
+        .resources-list a:hover {
+            text-decoration: underline;
+        }
+
+        #emergency {
+            background: rgba(255, 0, 0, 0.1);
+            border: 2px solid #ff0000;
+            text-align: center;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        #emergency a {
+            color: #ff0000;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .history-entry {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+            padding: 5px;
+            background: rgba(46, 125, 50, 0.1);
+            border-radius: 5px;
+        }
+
+        .journal-history {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .journal-entry {
+            background: rgba(46, 125, 50, 0.1);
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .journal-entry .date {
+            font-weight: bold;
+            color: #2E7D32;
+            margin-bottom: 5px;
+        }
+
+        .journal-entry .content {
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>MoodOverMind</h1>
+        <p>Mental Health for Everyone</p>
+    </div>
+
+    <div class="container">
+        <div class="panel full-width">
+            <h2>How are you feeling today?</h2>
+            <div class="mood-buttons">
+                <button class="mood-btn" onclick="recordMood('great')">😄</button>
+                <button class="mood-btn" onclick="recordMood('good')">🙂</button>
+                <button class="mood-btn" onclick="recordMood('okay')">😐</button>
+                <button class="mood-btn" onclick="recordMood('bad')">😕</button>
+                <button class="mood-btn" onclick="recordMood('terrible')">😢</button>
+            </div>
+            <div id="moodResponse"></div>
+        </div>
+
+        <div class="panel">
+            <h2>Mood History</h2>
+            <div id="moodHistory"></div>
+        </div>
+
+        <div class="panel">
+            <h2>Journal</h2>
+            <textarea id="journal" placeholder="Write your thoughts here..."></textarea>
+            <button onclick="saveJournal()" style="background: #2E7D32; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">Save Entry</button>
+        </div>
+
+        <div class="panel">
+            <h2>Journal History</h2>
+            <div id="journalHistory" class="journal-history"></div>
+        </div>
+
+        <div class="panel">
+  <h2>Breathing Exercise</h2>
+
+  <div class="breathing-container">
+    <div id="breathingCircle" class="breathing-circle">
+      <div class="breathing-text">Click to Start</div>
+      <div class="timer">20</div>
+    </div>
+
+    <button class="start-button">Start Exercise</button>
+  </div>
+
+  <style>
+    .breathing-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .breathing-circle {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background-color: rgba(59, 130, 246, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 1s ease-in-out;
+      position: relative;
+    }
+
+    .breathing-circle.active {
+      animation: breathing 8s ease-in-out infinite;
+    }
+
+    @keyframes breathing {
+      0%, 100% { transform: scale(1); }
+      25% { transform: scale(1.25); }
+      50% { transform: scale(1); }
+      75% { transform: scale(1.25); }
+    }
+
+    .breathing-text {
+      font-size: 1.25rem;
+      font-weight: 500;
+      color: rgb(255, 255, 255);
+      text-align: center;
+    }
+
+    .timer {
+      font-size: 0.875rem;
+      color: rgb(255, 255, 255);
+      margin-top: 0.5rem;
+    }
+
+    .start-button {
+      padding: 0.5rem 1rem;
+      background-color: rgb(59, 130, 246);
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .start-button:hover {
+      background-color: rgb(37, 99, 235);
+    }
+  </style>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const breathingCircle = document.querySelector('#breathingCircle');
+      const breathingText = breathingCircle.querySelector('.breathing-text');
+      const timer = breathingCircle.querySelector('.timer');
+      const startButton = document.querySelector('.start-button');
+      let isActive = false;
+      let count = 20;
+      let intervalId = null;
+
+      function updateBreathingPhase(timeLeft) {
+        const phase = Math.floor((timeLeft % 8) / 2);
+        switch (phase) {
+          case 0:
+            breathingText.textContent = 'Breathe In';
+            break;
+          case 1:
+            breathingText.textContent = 'Hold';
+            break;
+          case 2:
+            breathingText.textContent = 'Breathe Out';
+            break;
+          case 3:
+            breathingText.textContent = 'Hold';
+            break;
+        }
+      }
+
+      function startExercise() {
+        if (!isActive) {
+          isActive = true;
+          count = 20;
+          breathingCircle.classList.add('active');
+          startButton.style.display = 'none';
+          breathingText.textContent = 'Breathe In';
+          
+          intervalId = setInterval(() => {
+            count--;
+            timer.textContent = count;
+            updateBreathingPhase(count);
+            
+            if (count <= 0) {
+              stopExercise();
+            }
+          }, 1000);
+        }
+      }
+
+      function stopExercise() {
+        isActive = false;
+        clearInterval(intervalId);
+        breathingCircle.classList.remove('active');
+        breathingText.textContent = 'Click to Start';
+        timer.textContent = '20';
+        startButton.style.display = 'block';
+        count = 20;
+      }
+
+      breathingCircle.addEventListener('click', startExercise);
+      startButton.addEventListener('click', startExercise);
+    });
+  </script>
+</div>
+
+        <div class="panel">
+            <h2>Support Resources</h2>
+            <ul class="resources-list">
+                <li><a href="https://www.nami.org" target="_blank">National Alliance on Mental Illness (NAMI)</a></li>
+                <li><a href="https://www.samhsa.gov" target="_blank">SAMHSA's National Helpline</a></li>
+                <li><a href="https://www.therapistlocator.net" target="_blank">Find a Therapist</a></li>
+                <li><a href="https://www.mhanational.org" target="_blank">Mental Health America</a></li>
+            </ul>
+        </div>
+
+        <div class="panel full-width" id="emergency">
+            <a href="https://988lifeline.org/get-help/">Emergency Support: Call or Text 988 - Suicide and Crisis Lifeline</a>
+        </div>
+    </div>
+
+    <script>
+        const responses = {
+            great: "That's wonderful! Keep riding that positive wave!",
+            good: "Nice to hear you're doing well today!",
+            okay: "Remember, it's okay to have neutral days too.",
+            bad: "I'm sorry you're not feeling great. Remember this feeling is temporary.",
+            terrible: "I hear you. Please don't hesitate to reach out to someone you trust or use our support resources."
+        };
+
+        function recordMood(mood) {
+            const date = new Date().toLocaleString();
+            const historyDiv = document.getElementById('moodHistory');
+            const entry = document.createElement('div');
+            entry.className = 'history-entry';
+            entry.innerHTML = `
+                <span>${date}</span>
+                <span>${getMoodEmoji(mood)}</span>
+            `;
+            historyDiv.insertBefore(entry, historyDiv.firstChild);
+            
+            document.getElementById('moodResponse').textContent = responses[mood];
+        }
+
+        function getMoodEmoji(mood) {
+            const emojis = {
+                great: '😄',
+                good: '🙂',
+                okay: '😐',
+                bad: '😕',
+                terrible: '😢'
+            };
+            return emojis[mood];
+        }
+
+        function saveJournal() {
+            const journal = document.getElementById('journal');
+            const content = journal.value.trim();
+            
+            if (content) {
+                const date = new Date().toLocaleString();
+                const historyDiv = document.getElementById('journalHistory');
+                const entry = document.createElement('div');
+                entry.className = 'journal-entry';
+                entry.innerHTML = `
+                    <div class="date">${date}</div>
+                    <div class="content">${content}</div>
+                `;
+                historyDiv.insertBefore(entry, historyDiv.firstChild);
+                
+                journal.value = '';
+                alert('Journal entry saved!');
+            }
+        }
+
+        let breathingInterval;
+        let counter = 20;
+
+        function startBreathing() {
+            if (breathingInterval) {
+                clearInterval(breathingInterval);
+            }
+            
+            counter = 20;
+            document.getElementById('counter').textContent = counter;
+            
+            const circle = document.getElementById('breathingCircle');
+            breathingInterval = setInterval(() => {
+                // Inhale
+                circle.style.transform = 'scale(1.5)';
+                setTimeout(() => {
+                    // Hold
+                    circle.style.transform = 'scale(1.5)';
+                    setTimeout(() => {
+                        // Exhale
+                        circle.style.transform = 'scale(1)';
+                    }, 2000);
+                }, 4000);
+                
+                counter--;
+                document.getElementById('counter').textContent = counter;
+                
+                if (counter === 0) {
+                    clearInterval(breathingInterval);
+                    circle.style.transform = 'scale(1)';
+                }
+            }, 8000);
+        }
+    </script>
+</body>
+</html>
