@@ -5,4 +5,5 @@ MoodOverMind is a web-based mental health application developed for the 2024 Con
 
 The current version of MoodOverMind serves as the foundation for StudentSaver, another project that utilizes the base mood tracking and site features to support students in managing their academic and personal lives. Link to StudentSaver: [https://github.com/rifishies/StudentSaver](url)
 
-Link to demo video provided with submission: [https://youtu.be/KAhEK8hj5ho](url)
+Link to demo video provided with submission: [![Watch the video](https://img.youtube.com/vi/KAhEK8hj5ho/0.jpg)](https://www.youtube.com/watch?v=KAhEK8hj5ho)
+
